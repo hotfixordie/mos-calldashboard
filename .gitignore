@@ -1,0 +1,20 @@
+.env
+.DS_Store
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Local secrets
+credentials/*.json
+
+# Exported CRM/payment data and generated reports
+data/*
+!data/.gitkeep
+
+# Source exports / user-provided raw data
+source_files/*
+!source_files/.gitkeep
+
+!.env.example
+!credentials/.gitkeep
