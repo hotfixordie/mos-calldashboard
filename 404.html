@@ -297,9 +297,30 @@
     .num { text-align: right; font-variant-numeric: tabular-nums; }
     .center { text-align: center; }
 
+    .compact-table th,
+    .compact-table td {
+      padding: 8px 6px;
+    }
+
+    .compact-table .num {
+      text-align: center;
+    }
+
     .manager-name {
       font-weight: 700;
       color: var(--text);
+    }
+
+    .client-link {
+      color: var(--text);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    .client-link:hover {
+      color: var(--blue);
+      border-color: var(--blue);
     }
 
     .small-muted {
@@ -334,39 +355,16 @@
       margin-top: 4px;
     }
 
-    .review-actions {
+    .decision-cell {
       display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
     }
 
-    .review-btn {
-      min-height: 30px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--text);
-      padding: 0 10px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .review-btn:hover {
-      border-color: var(--blue);
-      color: var(--blue);
-    }
-
-    .review-btn.active.mos {
-      border-color: var(--red);
-      background: var(--red-soft);
-      color: var(--red);
-    }
-
-    .review-btn.active.client {
-      border-color: var(--green);
-      background: var(--green-soft);
-      color: var(--green);
+    .decision-source {
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .bar-row {
@@ -407,6 +405,37 @@
       font-size: 12px;
       text-align: right;
       font-variant-numeric: tabular-nums;
+    }
+
+    .trigger-directory {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .trigger-card {
+      min-height: 72px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: #fbfcfd;
+    }
+
+    .trigger-card-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .trigger-card-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .bar-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 2px 0 14px;
     }
 
     .call-list {
@@ -587,19 +616,19 @@
           </div>
         </div>
         <div class="panel-body" style="padding:0">
-          <table>
+          <table class="compact-table">
             <thead>
               <tr>
-                <th style="width:190px">МОС</th>
-                <th class="num" style="width:74px">Звонки</th>
-                <th class="num" style="width:86px">Подписали</th>
-                <th class="num" style="width:96px">Не подписали</th>
-                <th class="num" style="width:92px">На ОКК</th>
-                <th class="num" style="width:98px">Виноват МОС</th>
-                <th class="num" style="width:120px">Не подходит</th>
-                <th class="num" style="width:92px">Возраж.</th>
-                <th class="num" style="width:94px">Отработка</th>
-                <th class="num" style="width:76px">Оценка</th>
+                <th style="width:176px">МОС</th>
+                <th class="num" style="width:62px">Звонки</th>
+                <th class="num" style="width:78px">Подписали</th>
+                <th class="num" style="width:82px">Не подписали</th>
+                <th class="num" style="width:72px">На ОКК</th>
+                <th class="num" style="width:88px">Виноват МОС</th>
+                <th class="num" style="width:104px">Не подходит</th>
+                <th class="num" style="width:76px">Возраж.</th>
+                <th class="num" style="width:82px">Отработка</th>
+                <th class="num" style="width:64px">Оценка</th>
               </tr>
             </thead>
             <tbody id="managerRows"></tbody>
@@ -624,7 +653,7 @@
                 <th>Клиент / итог звонка</th>
                 <th style="width:170px">Статус декларации</th>
                 <th style="width:230px">Почему попал на ОКК</th>
-                <th style="width:300px">Решение ОКК</th>
+                <th style="width:230px">Результат проверки</th>
               </tr>
             </thead>
             <tbody id="okkRows"></tbody>
@@ -684,7 +713,11 @@
             <div class="panel-hint">Вспомогательный блок. Он показывает повторяющиеся причины риска, но не заменяет решение ОКК по неподписанной декларации.</div>
           </div>
         </div>
-        <div class="panel-body" id="riskBars"></div>
+        <div class="panel-body">
+          <div class="trigger-directory" id="triggerDirectory"></div>
+          <div class="bar-divider"></div>
+          <div id="riskBars"></div>
+        </div>
       </section>
 
       <section class="panel" id="schema">
@@ -702,7 +735,7 @@
             </div>
             <div class="schema-item">
               <strong>Триггеры риска</strong>
-              <span>родственники, супруг, страх дистанта, мошенники, сам закрою долги, платежи, госплатежи, ограничения; используются как подсказка, а не как единственный критерий.</span>
+              <span>супруг/ЛПР, родственники, не готов подписывать согласие, госплатежи, арест счетов 50 тысяч, сам закрою, страх дистанта, мошенники, недоверие.</span>
             </div>
             <div class="schema-item">
               <strong>Отработка возражений</strong>
@@ -730,6 +763,7 @@
     const calls = [
       {
         id: "CALL-1001", date: "2026-05-27", manager: "Агеева Елена", type: "Знакомство",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420889",
         client: "Клиент А", result: "Готов продолжать", ready: true, risk: "low", score: 91,
         triggers: [], objections: 1, worked: 1, nextStep: "Разбор документов до 18:00", agreement: true,
         declaration: "signed", okkDecision: null,
@@ -737,13 +771,15 @@
       },
       {
         id: "CALL-1002", date: "2026-05-27", manager: "Агеева Елена", type: "Разбор документов",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420890",
         client: "Клиент Б", result: "Нужен разговор с супругом", ready: false, risk: "high", score: 64,
-        triggers: ["Супруг/ЛПР", "Не готов подписывать"], objections: 3, worked: 1, nextStep: "Подключить ЛПР", agreement: false,
+        triggers: ["Супруг/ЛПР", "Не готов подписывать согласие"], objections: 3, worked: 1, nextStep: "Подключить ЛПР", agreement: false,
         declaration: "not_signed", okkDecision: "pending",
         okk: true, recommendation: "Тимлид + ОКК"
       },
       {
         id: "CALL-1003", date: "2026-05-26", manager: "Лихачева Милана", type: "Знакомство",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420891",
         client: "Клиент В", result: "Сомневается", ready: false, risk: "medium", score: 76,
         triggers: ["Страх дистанта", "Мошенники"], objections: 2, worked: 2, nextStep: "Повторный звонок", agreement: true,
         declaration: "sent", okkDecision: null,
@@ -751,41 +787,47 @@
       },
       {
         id: "CALL-1004", date: "2026-05-26", manager: "Лихачева Милана", type: "Разбор документов",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420892",
         client: "Клиент Г", result: "Просит подумать", ready: false, risk: "high", score: 59,
-        triggers: ["Нет даты решения", "Родственники"], objections: 2, worked: 0, nextStep: "Нет четкой даты", agreement: false,
+        triggers: ["Не готов подписывать согласие", "Родственники"], objections: 2, worked: 0, nextStep: "Нет четкой даты", agreement: false,
         declaration: "not_signed", okkDecision: "pending",
         okk: true, recommendation: "ОКК: нет закрытия риска"
       },
       {
         id: "CALL-1005", date: "2026-05-25", manager: "Андреев Александр", type: "Знакомство",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420893",
         client: "Клиент Д", result: "Готов продолжать", ready: true, risk: "low", score: 88,
-        triggers: ["Госплатежи уточнены"], objections: 1, worked: 1, nextStep: "OkiDoki", agreement: true,
+        triggers: ["Госплатежи"], objections: 1, worked: 1, nextStep: "OkiDoki", agreement: true,
         declaration: "signed", okkDecision: null,
         okk: false, recommendation: "Обычное ведение"
       },
       {
         id: "CALL-1006", date: "2026-05-25", manager: "Андреев Александр", type: "Разбор документов",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420894",
         client: "Клиент Е", result: "Хочет закрыть долги сам", ready: false, risk: "critical", score: 42,
-        triggers: ["Сам закрою", "Родственники помогут"], objections: 3, worked: 1, nextStep: "Тимлид сегодня", agreement: true,
+        triggers: ["Сам закрою", "Родственники"], objections: 3, worked: 1, nextStep: "Тимлид сегодня", agreement: true,
         declaration: "not_signed", okkDecision: "client_not_fit",
         okk: true, recommendation: "Срочно тимлид"
       },
       {
         id: "CALL-1007", date: "2026-05-24", manager: "Ксенз Максим", type: "Знакомство",
-        client: "Клиент Ж", result: "Не понял ограничения", ready: false, risk: "medium", score: 72,
-        triggers: ["Ограничения счетов", "50 000 ₽"], objections: 2, worked: 1, nextStep: "Разъяснить повторно", agreement: true,
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420895",
+        client: "Клиент Ж", result: "Не понял арест счетов", ready: false, risk: "medium", score: 72,
+        triggers: ["Арест счетов 50 тысяч"], objections: 2, worked: 1, nextStep: "Разъяснить повторно", agreement: true,
         declaration: "sent", okkDecision: null,
         okk: false, recommendation: "Повторить условия"
       },
       {
         id: "CALL-1008", date: "2026-05-24", manager: "Ксенз Максим", type: "Разбор документов",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420896",
         client: "Клиент З", result: "Не выходит на связь", ready: false, risk: "critical", score: 35,
-        triggers: ["Недозвон", "Нет договоренности"], objections: 0, worked: 0, nextStep: "3 дня неактивности", agreement: false,
+        triggers: ["Недозвон"], objections: 0, worked: 0, nextStep: "3 дня неактивности", agreement: false,
         declaration: "not_signed", okkDecision: "mos_fault",
         okk: true, recommendation: "Процесс неактивного"
       },
       {
         id: "CALL-1009", date: "2026-05-23", manager: "Агеева Елена", type: "Знакомство",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420897",
         client: "Клиент И", result: "С расхождениями после МПП", ready: false, risk: "high", score: 61,
         triggers: ["Обещания МПП", "Недоверие"], objections: 4, worked: 2, nextStep: "Передать сигнал продажам", agreement: true,
         declaration: "signed", okkDecision: null,
@@ -793,6 +835,7 @@
       },
       {
         id: "CALL-1010", date: "2026-05-23", manager: "Лихачева Милана", type: "Знакомство",
+        leadUrl: "https://donula.amocrm.ru/leads/detail/25420898",
         client: "Клиент К", result: "Готов продолжать", ready: true, risk: "low", score: 93,
         triggers: [], objections: 0, worked: 0, nextStep: "Подписать согласие", agreement: true,
         declaration: "signed", okkDecision: null,
@@ -826,11 +869,29 @@
       client_not_fit: "Клиент не подходит к процедуре"
     };
 
+    const decisionClass = {
+      pending: "medium",
+      mos_fault: "high",
+      client_not_fit: "low"
+    };
+
+    const triggerDirectory = [
+      ["Супруг/ЛПР", "Клиент переносит решение на супруга или другого принимающего решение."],
+      ["Родственники", "Давление семьи или обещание помочь закрыть долг."],
+      ["Не готов подписывать согласие", "Клиент тормозит именно на декларации/согласии."],
+      ["Госплатежи", "Сомнения или непонимание обязательных платежей по процедуре."],
+      ["Арест счетов 50 тысяч", "Страх ограничений по счетам и лимита средств."],
+      ["Сам закрою", "Клиент считает, что сможет выйти из долгов без процедуры."],
+      ["Страх дистанта", "Недоверие к удаленному формату работы."],
+      ["Мошенники", "Клиент прямо или косвенно сомневается в надежности компании."],
+      ["Недозвон", "После разговора клиент перестает быть доступным."],
+      ["Обещания МПП", "У клиента есть расхождения между продажей и сопровождением."]
+    ];
+
     const managerFilter = document.getElementById("managerFilter");
     const typeFilter = document.getElementById("typeFilter");
     const periodFilter = document.getElementById("periodFilter");
     const resetBtn = document.getElementById("resetBtn");
-    const okkRows = document.getElementById("okkRows");
 
     [...new Set(calls.map(c => c.manager))].sort().forEach(manager => {
       const option = document.createElement("option");
@@ -846,15 +907,6 @@
       periodFilter.value = "30";
       managerFilter.value = "all";
       typeFilter.value = "all";
-      render();
-    });
-
-    okkRows.addEventListener("click", event => {
-      const button = event.target.closest("[data-decision]");
-      if (!button) return;
-      const call = calls.find(item => item.id === button.dataset.id);
-      if (!call) return;
-      call.okkDecision = button.dataset.decision;
       render();
     });
 
@@ -1000,6 +1052,24 @@
       return `<span class="badge ${className}">${declarationNames[call.declaration]}</span>`;
     }
 
+    function decisionBadge(call) {
+      const decision = call.okkDecision || "pending";
+      return `<span class="badge ${decisionClass[decision] || "neutral"}">${decisionNames[decision]}</span>`;
+    }
+
+    function clientLink(call) {
+      return `<a class="client-link" href="${call.leadUrl}" target="_blank" rel="noopener noreferrer">${call.client}</a>`;
+    }
+
+    function renderTriggerDirectory() {
+      document.getElementById("triggerDirectory").innerHTML = triggerDirectory.map(trigger => `
+        <div class="trigger-card">
+          <div class="trigger-card-title">${trigger[0]}</div>
+          <div class="trigger-card-note">${trigger[1]}</div>
+        </div>
+      `).join("");
+    }
+
     function renderOkk(data) {
       const okk = data.filter(c => c.declaration === "not_signed").sort((a, b) => a.score - b.score);
       document.getElementById("okkCount").textContent = `${okk.length} клиентов`;
@@ -1008,7 +1078,7 @@
           <td>${call.date}</td>
           <td>${call.manager}</td>
           <td>
-            <b>${call.client}</b>
+            ${clientLink(call)}
             <span class="small-muted">${call.type} · ${call.result}</span>
           </td>
           <td>
@@ -1020,9 +1090,9 @@
             <span class="small-muted">${call.recommendation}</span>
           </td>
           <td>
-            <div class="review-actions">
-              <button class="review-btn mos ${call.okkDecision === "mos_fault" ? "active" : ""}" type="button" data-id="${call.id}" data-decision="mos_fault">Виноват МОС</button>
-              <button class="review-btn client ${call.okkDecision === "client_not_fit" ? "active" : ""}" type="button" data-id="${call.id}" data-decision="client_not_fit">Клиент не подходит к процедуре</button>
+            <div class="decision-cell">
+              ${decisionBadge(call)}
+              <span class="decision-source">поле результата проверки из АМА</span>
             </div>
           </td>
         </tr>
@@ -1035,7 +1105,7 @@
           <td>${call.date}</td>
           <td>${call.manager}</td>
           <td><span class="badge blue">${call.type}</span></td>
-          <td><b>${call.client}</b><span class="small-muted">${call.result}</span></td>
+          <td>${clientLink(call)}<span class="small-muted">${call.result}</span></td>
           <td>${call.triggers.length ? call.triggers.map(t => `<span class="tag">${t}</span>`).join(" ") : `<span class="tag">Без риска</span>`}</td>
           <td>${declarationBadge(call)}</td>
           <td><span class="badge ${riskClass[call.risk]}">${riskNames[call.risk]}</span></td>
@@ -1083,6 +1153,7 @@
       renderQuality(data);
       renderOkk(data);
       renderCalls(data);
+      renderTriggerDirectory();
     }
 
     render();
